@@ -50,3 +50,93 @@ const LearnerSubmissions = [
     { learner_id: 132, assignment_id: 2, submission: { submitted_at: "2023-03-07", score: 140 } }
 ];
 
+// creating a function to process the learners data and for score calculation
+function getLearnerData(course, assignmentGroups, learnerSubmissions) {
+    // i want to first make sure that the assignment group actually belongs to the course
+    for (let i = 0; i < assignmentGroups.length; i++) {
+        if (assignmentGroups[i].course_id !== course.id) {
+            // if an assignment group does not match the course, i throw an ERRORRRR to avoid incorrect data processing
+            throw new Error("invalid! the assignment group does not match the course");
+        }
+    }
+
+    let learners = {}; // creating an empty object to store each learner's scores and progress
+    
+    // will be looping thru each learner submission to process their scores
+    for (let i = 0; i < learnerSubmissions.length; i++) {
+        let { learner_id, assignment_id, submission: { submitted_at, score } } = learnerSubmissions[i];
+        let assignmentInfo;
+        
+        // finding the matching assignment by looping thru all assignment groups
+        for (let j = 0; j < assignmentGroups.length; j++) {
+            for (let k = 0; k < assignmentGroups[j].assignments.length; k++) {
+                if (assignmentGroups[j].assignments[k].id === assignment_id) {
+                    assignmentInfo = assignmentGroups[j].assignments[k];
+                    break;
+                }
+            }
+            if (assignmentInfo) {
+                break;
+            }
+        }
+        
+        if (!assignmentInfo) {
+            // if a submission references an assignment that DNEs.. i throw an error
+            throw new Error("invalid! the assignment was not found");
+        }
+        
+        if (assignmentInfo.points_possible === 0) {
+            // if an assignment has zero possible points it skips it to avoid division by zero errors
+            console.warn("warning points_possible is zero for assignment", assignmentInfo.id);
+            continue;
+        }
+        
+        let dueDate = new Date(assignmentInfo.due_at); // getting the due date of the assignment
+        let submittedDate = new Date(submitted_at); // getting the date the student submitted
+        if (submittedDate > dueDate) {
+            // if the submission is late...10 percent of the points gets deducted 
+            score -= assignmentInfo.points_possible * 0.1;
+        }
+        
+        if (!learners[learner_id]) {
+            // if learner DNE in the object yet..there is an entry for that
+            learners[learner_id] = { id: learner_id, avg: 0, totalPoints: 0, maxPoints: 0 };
+        }
+        
+        let percentage = (score / assignmentInfo.points_possible) * 100; // calculation percentage score for this assignment
+        learners[learner_id][assignment_id] = percentage; // storing the percentage score
+        learners[learner_id].totalPoints += score; // adding this score to total points
+        learners[learner_id].maxPoints += assignmentInfo.points_possible; // adding max possible points to keep track of total grading
+    }
+    
+    let result = []; // array to hold the final processed student data
+    for (let learnerId in learners) {
+        // calculating the weighted average for each learner
+        learners[learnerId].avg = (learners[learnerId].totalPoints / learners[learnerId].maxPoints) * 100;
+        delete learners[learnerId].totalPoints;
+        delete learners[learnerId].maxPoints;
+        result.push(learners[learnerId]); // adding the learners final data to the array
+    }
+    return result; // returning of the final processed data
+}
+
+// similiar format like the sandbox example will be printed..
+const result = getLearnerData(CourseInfo, [AssignmentGroup], LearnerSubmissions);
+console.log("[");
+for (let i = 0; i < result.length; i++) {
+    let learner = result[i];
+    console.log("  {");
+    console.log("    id:", learner.id + ",");
+    console.log("    avg:", learner.avg.toFixed(2) + ",");
+    
+    let assignmentKeys = Object.keys(learner).filter(key => key !== "id" && key !== "avg");
+    for (let j = 0; j < assignmentKeys.length; j++) {
+        let key = assignmentKeys[j];
+        let comma = j === assignmentKeys.length - 1 ? "" : ",";
+        console.log("    " + key + ":", learner[key].toFixed(2) + comma);
+    }
+    
+    let learnerComma = i === result.length - 1 ? "" : ",";
+    console.log("  }" + learnerComma);
+}
+console.log("]");
