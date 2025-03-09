@@ -1,4 +1,4 @@
-//SBA 308 javascript fundamentals
+// SBA 308 javascript fundamentals
 
 /*creating a grade processing app to process and manage scores of students
 also to calculate scores and averages
@@ -11,15 +11,15 @@ loops and iteration for navigation thru data collections
 implementing error handling for any code failures
 revised methods of recursions array methods and any topic needed for this SBA along the way*/
 
-//first will do function setup to ensure that assignments groups are in the correct course 
-//in this step i am verifying in a way that the given data is valid and belongs before continuing on 
-//i am creating this function to take in course info, assignment groups, and learner submissions
+// first will do function setup to ensure that assignments groups are in the correct course 
+// in this step i am verifying in a way that the given data is valid and belongs before continuing on 
+// i am creating this function to take in course info, assignment groups, and learner submissions
 
 // starting with function to process learner data and calculate scores
 
 // i am defining the course information so that i can use it later
 // this object holds details about the course like its id and name, which will help in checking if assignments belong to this course
-
+// its like storage
 const CourseInfo = {
     id: 451, // unique id for the course
     name: "Introduction to JavaScript" // this is the name of the course
@@ -27,7 +27,6 @@ const CourseInfo = {
 
 // i am defining the assignment group which holds all the assignments for this course
 // this helps in grouping assignments together so they can be processed in relation to the course
-
 const AssignmentGroup = {
     id: 12345, // unique id for the assignment group
     name: "Fundamentals of JavaScript", // name of the assignment group
@@ -53,8 +52,8 @@ const LearnerSubmissions = [
 // creating a function to process the learners data and for score calculation
 function getLearnerData(course, assignmentGroups, learnerSubmissions) {
     // i want to first make sure that the assignment group actually belongs to the course
-    for (let i = 0; i < assignmentGroups.length; i++) {
-        if (assignmentGroups[i].course_id !== course.id) {
+    for (let groupNum = 0; groupNum < assignmentGroups.length; groupNum++) {
+        if (assignmentGroups[groupNum].course_id !== course.id) {
             // if an assignment group does not match the course, i throw an ERRORRRR to avoid incorrect data processing
             throw new Error("invalid! the assignment group does not match the course");
         }
@@ -68,10 +67,14 @@ function getLearnerData(course, assignmentGroups, learnerSubmissions) {
         let assignmentInfo;
         
         // finding the matching assignment by looping thru all assignment groups
-        for (let j = 0; j < assignmentGroups.length; j++) {
-            for (let k = 0; k < assignmentGroups[j].assignments.length; k++) {
-                if (assignmentGroups[j].assignments[k].id === assignment_id) {
-                    assignmentInfo = assignmentGroups[j].assignments[k];
+        for (let groupNum = 0; groupNum < assignmentGroups.length; groupNum++) {
+            let currentGroup = assignmentGroups[groupNum]; // current assignment group
+
+            for (let assignmentNum = 0; assignmentNum < currentGroup.assignments.length; assignmentNum++) {
+                let currentAssignment = currentGroup.assignments[assignmentNum]; // current assignment
+
+                if (currentAssignment.id === assignment_id) {
+                    assignmentInfo = currentAssignment;
                     break;
                 }
             }
@@ -123,20 +126,20 @@ function getLearnerData(course, assignmentGroups, learnerSubmissions) {
 // similiar format like the sandbox example will be printed..
 const result = getLearnerData(CourseInfo, [AssignmentGroup], LearnerSubmissions);
 console.log("[");
-for (let i = 0; i < result.length; i++) {
-    let learner = result[i];
+for (let studentNum = 0; studentNum < result.length; studentNum++) {
+    let learner = result[studentNum];
     console.log("  {");
     console.log("    id:", learner.id + ",");
     console.log("    avg:", learner.avg.toFixed(2) + ",");
-    
+
     let assignmentKeys = Object.keys(learner).filter(key => key !== "id" && key !== "avg");
-    for (let j = 0; j < assignmentKeys.length; j++) {
-        let key = assignmentKeys[j];
-        let comma = j === assignmentKeys.length - 1 ? "" : ",";
+    for (let assignmentKeyNum = 0; assignmentKeyNum < assignmentKeys.length; assignmentKeyNum++) {
+        let key = assignmentKeys[assignmentKeyNum];
+        let comma = assignmentKeyNum === assignmentKeys.length - 1 ? "" : ",";
         console.log("    " + key + ":", learner[key].toFixed(2) + comma);
     }
-    
-    let learnerComma = i === result.length - 1 ? "" : ",";
+
+    let learnerComma = studentNum === result.length - 1 ? "" : ",";
     console.log("  }" + learnerComma);
 }
 console.log("]");
