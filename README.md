@@ -26,6 +26,19 @@ Math operations (percentages, averages)
 String formatting (toFixed(2)) 
 
 
+Methods I Could Have Used to Make My Code Cleaner
+Although my code works as expected, here are some JavaScript methods that could be utilized and efficient:
+
+1. .forEach() instead of for loops because it is a cleaner way to iterate over arrays.
+    I at first used it but got a little lost additonally, I didnt use it because doesnt allow break or continue, which I needed in my loops.
+2. .map() Instead of manually storing data as it creates a new array with modified values.
+   I didnt use due to to modifying an object (learners) effectively rather than creating a new array.
+3. .reduce() for calculating averages as it helps accumulate values in a single pass, making calculations more concise.
+   I did not use it as my method with loops works fine and aligns with what I learned in my lectures more comfortably for me.
+4. Template Literals instead of multiple console.log() calls as it makes structured output cleaner and easier to read.
+   I wanted to stick to simple formatting for my assignment and my approach follows the expected structure.
+6. Math.round() Instead of .toFixed(2) Math.round(value * 100) / 100 can round numbers to two decimal places without converting them to strings.
+   I didnt use it due to using .toFixed(2) I liked it as it was simpler for formatting output.
 
 
 External Resources
